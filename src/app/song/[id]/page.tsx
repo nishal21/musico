@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { PlayIcon } from '@heroicons/react/24/solid';
 import { useTheme } from '@/contexts/ThemeContext';
 
+export const dynamic = 'force-dynamic';
+
 interface Release {
   id: string;
   title: string;
