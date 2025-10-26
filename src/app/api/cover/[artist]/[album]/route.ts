@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import albumArt from 'album-art';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ artist: string; album: string }> }
