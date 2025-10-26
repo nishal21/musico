@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import LoadingScreen from '@/components/LoadingScreen';
-import LandingPage from '@/components/LandingPage';
 import MusicCard from '@/components/MusicCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SunIcon, MoonIcon, HeartIcon } from '@heroicons/react/24/outline';
@@ -18,7 +16,6 @@ export default function Home() {
   const { theme, toggleTheme } = useTheme();
   
   console.log('Current theme:', theme);
-  const [appState, setAppState] = useState<'loading' | 'landing' | 'app'>('landing');
   const [trending, setTrending] = useState<Release[]>([]);
   const [genres, setGenres] = useState<Array<{ name: string }>>([]);
   const [searchResults, setSearchResults] = useState<Release[]>([]);
@@ -40,32 +37,6 @@ export default function Home() {
       setFavorites(new Set(JSON.parse(savedFavorites)));
     }
   }, []);
-
-  const handleLoadingComplete = () => {
-    setAppState('landing');
-  };
-
-  const handleEnterApp = () => {
-    window.location.href = '/discover';
-  };
-
-  // Only load app data when entering the main app
-  useEffect(() => {
-    if (appState === 'app') {
-      loadTrending();
-      loadGenres();
-    }
-  }, [appState]);
-
-  // Load favorites from localStorage when entering app
-  useEffect(() => {
-    if (appState === 'app') {
-      const savedFavorites = localStorage.getItem('favorites');
-      if (savedFavorites) {
-        setFavorites(new Set(JSON.parse(savedFavorites)));
-      }
-    }
-  }, [appState]);
 
   // Save favorites to localStorage
   const saveFavorites = (newFavorites: Set<string>) => {
@@ -175,15 +146,6 @@ export default function Home() {
     // Navigate to detail page
     window.location.href = `/song/${item.id}`;
   };
-
-  // Show LoadingScreen -> LandingPage -> App based on appState
-  if (appState === 'loading') {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
-
-  if (appState === 'landing') {
-    return <LandingPage onEnterApp={handleEnterApp} />;
-  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -296,7 +258,7 @@ export default function Home() {
                       <svg
                         xmlnsXlink="http://www.w3.org/1999/xlink"
                         viewBox="0 0 26.3 65.33"
-                        style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'auto', fillRule: 'evenodd', clipRule: 'evenodd'}}
+                        style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'optimizeQuality', fillRule: 'evenodd', clipRule: 'evenodd'}}
                         version="1.1"
                         xmlSpace="preserve"
                         xmlns="http://www.w3.org/2000/svg"
@@ -315,7 +277,7 @@ export default function Home() {
                       <svg
                         xmlnsXlink="http://www.w3.org/1999/xlink"
                         viewBox="0 0 11.67 37.63"
-                        style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'auto', fillRule: 'evenodd', clipRule: 'evenodd'}}
+                        style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'optimizeQuality', fillRule: 'evenodd', clipRule: 'evenodd'}}
                         version="1.1"
                         xmlSpace="preserve"
                         xmlns="http://www.w3.org/2000/svg"
@@ -334,7 +296,7 @@ export default function Home() {
                       <svg
                         xmlnsXlink="http://www.w3.org/1999/xlink"
                         viewBox="0 0 25.29 76.92"
-                        style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'auto', fillRule: 'evenodd', clipRule: 'evenodd'}}
+                        style={{shapeRendering: 'geometricPrecision', textRendering: 'geometricPrecision', imageRendering: 'optimizeQuality', fillRule: 'evenodd', clipRule: 'evenodd'}}
                         version="1.1"
                         xmlSpace="preserve"
                         xmlns="http://www.w3.org/2000/svg"

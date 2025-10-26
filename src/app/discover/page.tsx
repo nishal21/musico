@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import LoadingScreen from '@/components/LoadingScreen';
-import LandingPage from '@/components/LandingPage';
 import MusicCard from '@/components/MusicCard';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SunIcon, MoonIcon, HeartIcon } from '@heroicons/react/24/outline';
+import PWAInstallButton from '@/components/PWAInstallButton';
 
 interface Release {
   id: string;
@@ -18,7 +17,6 @@ export default function Home() {
   const { theme, toggleTheme } = useTheme();
   
   console.log('Current theme:', theme);
-  const [appState, setAppState] = useState<'loading' | 'landing' | 'app'>('landing');
   const [trending, setTrending] = useState<Release[]>([]);
   const [genres, setGenres] = useState<Array<{ name: string }>>([]);
   const [searchResults, setSearchResults] = useState<Release[]>([]);
@@ -40,32 +38,6 @@ export default function Home() {
       setFavorites(new Set(JSON.parse(savedFavorites)));
     }
   }, []);
-
-  const handleLoadingComplete = () => {
-    setAppState('landing');
-  };
-
-  const handleEnterApp = () => {
-    window.location.href = '/discover';
-  };
-
-  // Only load app data when entering the main app
-  useEffect(() => {
-    if (appState === 'app') {
-      loadTrending();
-      loadGenres();
-    }
-  }, [appState]);
-
-  // Load favorites from localStorage when entering app
-  useEffect(() => {
-    if (appState === 'app') {
-      const savedFavorites = localStorage.getItem('favorites');
-      if (savedFavorites) {
-        setFavorites(new Set(JSON.parse(savedFavorites)));
-      }
-    }
-  }, [appState]);
 
   // Save favorites to localStorage
   const saveFavorites = (newFavorites: Set<string>) => {
@@ -112,8 +84,12 @@ export default function Home() {
   }, []);
 
   const loadTrending = async () => {
-    const currentYear = new Date().getFullYear();
-    const cacheKey = 'trending_releases_' + currentYear;
+    const currentDate = new Date();
+    const sixMonthsAgo = new Date(currentDate);
+    sixMonthsAgo.setMonth(currentDate.getMonth() - 6);
+    const startDate = sixMonthsAgo.toISOString().split('T')[0];
+    const endDate = currentDate.toISOString().split('T')[0];
+    const cacheKey = 'trending_releases_' + startDate + '_' + endDate;
     let data = cache.get(cacheKey);
     if (data) {
       setTrending(data.releases);
@@ -121,13 +97,35 @@ export default function Home() {
       return;
     }
 
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     try {
-      const response = await fetch(`${baseURL}release?query=date:[2024-01-01 TO ${currentYear}-12-31]&limit=20&fmt=json`, { headers });
+      const response = await fetch(`${baseURL}release?query=date:[${startDate} TO ${endDate}]&limit=20&fmt=json`, { 
+        headers,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       data = await response.json();
       cache.set(cacheKey, data);
       setTrending(data.releases);
-    } catch (error) {
-      console.error('Error loading trending:', error);
+    } catch (error: unknown) {
+      clearTimeout(timeoutId);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.error('Request timed out');
+        // Fallback to a simpler query
+        try {
+          const fallbackResponse = await fetch(`${baseURL}release?query=date:[${currentDate.getFullYear()}-01-01 TO ${currentDate.getFullYear()}-12-31]&limit=10&fmt=json`, { headers });
+          const fallbackData = await fallbackResponse.json();
+          cache.set(cacheKey, fallbackData);
+          setTrending(fallbackData.releases);
+        } catch (fallbackError) {
+          console.error('Fallback request also failed:', fallbackError);
+        }
+      } else {
+        console.error('Error loading trending:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -141,12 +139,21 @@ export default function Home() {
       return;
     }
 
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     try {
-      const response = await fetch(`${baseURL}genre/all?limit=20&fmt=json`, { headers });
+      const response = await fetch(`${baseURL}genre/all?limit=20&fmt=json`, { 
+        headers,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       data = await response.json();
       cache.set(cacheKey, data, 86400000);
       setGenres(data.genres);
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('Error loading genres:', error);
     }
   };
@@ -154,13 +161,22 @@ export default function Home() {
   const searchMusic = async () => {
     if (!searchQuery.trim()) return;
 
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     try {
-      const response = await fetch(`${baseURL}${searchType}?query=${encodeURIComponent(searchQuery)}&limit=20&fmt=json`, { headers });
+      const response = await fetch(`${baseURL}${searchType}?query=${encodeURIComponent(searchQuery)}&limit=20&fmt=json`, { 
+        headers,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       const data = await response.json();
       const key = searchType + 's';
       setSearchResults(data[key] || []);
       setView('search');
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('Error searching:', error);
     }
   };
@@ -175,15 +191,6 @@ export default function Home() {
     // Navigate to detail page
     window.location.href = `/song/${item.id}`;
   };
-
-  // Show LoadingScreen -> LandingPage -> App based on appState
-  if (appState === 'loading') {
-    return <LoadingScreen onComplete={handleLoadingComplete} />;
-  }
-
-  if (appState === 'landing') {
-    return <LandingPage onEnterApp={handleEnterApp} />;
-  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -223,7 +230,7 @@ export default function Home() {
               </div>
               
               <div className="flex items-center gap-2">
-                
+                <PWAInstallButton />
                 <button
                   onClick={() => {
                     console.log('Theme toggle clicked, current theme:', theme);
@@ -251,7 +258,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 lg:mb-6 gap-2">
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Latest Releases</h2>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <span>✨ Fresh music from {new Date().getFullYear()}</span>
+                  <span>✨ Fresh music from the last 6 months</span>
                 </div>
               </div>
               {loading ? (
