@@ -403,7 +403,7 @@ included in all copies or substantial portions of the Software.
 
 ### Get Help
 
-- 📧 **Email**: support@musico.app
+- 📧 **Email**: nishalamv@gmail.com
 - 🐛 **Issues**: [GitHub Issues](https://github.com/nishal21/musico/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/nishal21/musico/discussions)
 - 📖 **Documentation**: [Wiki](https://github.com/nishal21/musico/wiki)
