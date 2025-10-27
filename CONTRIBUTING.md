@@ -35,7 +35,7 @@ Before you begin, ensure you have the following installed:
 1. **Fork the repository** on GitHub
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/your-username/musico.git
+   git clone https://github.com/nishal21/musico.git
    cd musico
    ```
 3. **Add upstream remote**:

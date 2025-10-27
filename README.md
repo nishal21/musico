@@ -24,11 +24,12 @@
 ## ✨ Features
 
 ### 🎯 **Core Features**
-- 🎵 **Smart Music Discovery**: Explore latest releases from the last 6 months
-- 🔍 **Advanced Search**: Search by artist, album, track, or genre
-- ❤️ **Personal Favorites**: Save and manage your favorite songs
+- 🎵 **Jango Integration**: Stream music from 40+ Jango radio stations
+- 🔍 **Advanced Search**: Search and filter through available stations
+- 🎲 **Random Discovery**: Random station and song selection for exploration
 - 🎨 **Beautiful UI**: Modern design with smooth animations and transitions
-- 🌙 **Dark/Light Theme**: Automatic theme switching with system preference detection
+- 🌙 **Dark Theme**: Deep black theme optimized for music listening
+- 📱 **Responsive**: Perfect on all devices with adaptive layouts
 
 ### 📱 **PWA (Progressive Web App)**
 - 📲 **Installable**: Add to home screen on mobile and desktop
@@ -161,12 +162,36 @@ musico/
 Create a `.env.local` file for local development:
 
 ```env
-# MusicBrainz API Configuration
-MUSICBRAINZ_USER_AGENT=Musico/1.0.0 (your-email@example.com)
-
-# Optional: Analytics
-NEXT_PUBLIC_ANALYTICS_ID=your-analytics-id
+# Jango API Configuration
+NEXT_PUBLIC_JANGO_API_URL=http://localhost:3000
+NEXT_PUBLIC_PROXY_API_URL=https://your-cors-proxy.workers.dev/?url=
 ```
+
+**Important**: Never commit your `.env.local` file to the repository. The `.env.example` file shows the required structure.
+
+### API Setup
+
+1. **Local Development**: Use the placeholder values in `.env.example`
+2. **Production**: Replace with your actual deployed API URLs
+3. **CORS Proxy**: Required for audio streaming in browsers
+
+#### Setting up CORS Proxy
+
+For audio streaming to work properly, you need to set up a CORS proxy. Refer to this guide:
+- **Proxy Setup Guide**: https://gist.github.com/itzzzme/180813be2c7b45eedc8ce8344c8dea3b
+
+#### Jango API
+
+This project uses the unofficial Jango API for music streaming:
+- **Repository**: https://github.com/nishal21/unofficial-jango-api
+- **Local Setup**: Run the API server on port 3000
+- **Features**: Station listings, song data, and streaming URLs
+
+### Repository Safety
+
+- ✅ `.env.local` is in `.gitignore`
+- ✅ Use `.env.example` as a template
+- ✅ Never commit real API keys or URLs
 
 ### Code Quality
 
@@ -187,31 +212,31 @@ npm run test:coverage
 
 ## 📊 API & Data
 
-### MusicBrainz Integration
+### Jango API Integration
 
-Musico uses the [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API) for music data:
+Musico uses the [Unofficial Jango API](https://github.com/nishal21/unofficial-jango-api) for music streaming:
 
-- **Base URL**: `https://musicbrainz.org/ws/2/`
-- **Rate Limit**: 1 request/second (anonymous)
-- **Authentication**: User-Agent header required
-- **Data Coverage**: 2M+ artists, 3M+ releases
+- **Base URL**: `http://localhost:3000` (local) or your deployed API
+- **Features**: 40+ radio stations, real-time song data, streaming URLs
+- **CORS Proxy**: Required for audio streaming in browsers
+- **Data**: Station metadata, current songs, album art, streaming URLs
 
 ### Data Flow
 
 ```mermaid
 graph TD
-    A[User Search] --> B[Next.js API Route]
-    B --> C[MusicBrainz API]
-    C --> D[Data Processing]
-    D --> E[Client Component]
-    E --> F[UI Rendering]
+    A[User Selects Station] --> B[Next.js Client]
+    B --> C[Jango API Server]
+    C --> D[Jango Radio Service]
+    D --> E[Song Metadata + Stream URL]
+    E --> F[Client Audio Player]
 ```
 
 ### Caching Strategy
 
-- **Browser Cache**: localStorage for API responses
-- **Service Worker**: Static assets and critical resources
-- **TTL**: 1 hour for API data, 24 hours for genres
+- **Browser Cache**: localStorage for station lists
+- **API Responses**: Cached for 5 minutes to reduce requests
+- **Song Queue**: 100 songs cached per station for smooth playback
 
 ## 🚀 Deployment
 
@@ -393,11 +418,13 @@ included in all copies or substantial portions of the Software.
 
 ## 🙏 Acknowledgments
 
-- **MusicBrainz** for the comprehensive music database
+- **Jango** for the amazing radio streaming service
+- **Unofficial Jango API** for providing the backend integration
 - **Next.js Team** for the amazing framework
 - **Vercel** for hosting and deployment
 - **Tailwind CSS** for the utility-first CSS framework
 - **Heroicons** for beautiful icons
+- **Cloudflare Workers** for CORS proxy solutions
 
 ## 📞 Support
 

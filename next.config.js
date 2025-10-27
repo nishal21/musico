@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  async rewrites() {
+    return [
+      {
+        source: '/api/jango/:path*',
+        destination: 'https://jango-psi.vercel.app/:path*',
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

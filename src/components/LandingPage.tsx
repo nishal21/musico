@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
-import { PlayIcon, HeartIcon, MagnifyingGlassIcon, MoonIcon, SunIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, HeartIcon, MagnifyingGlassIcon, MoonIcon, SunIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import { PlayIcon as PlayIconSolid } from '@heroicons/react/24/solid';
 
 interface LandingPageProps {
@@ -118,7 +118,15 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
                 Start Exploring
               </span>
             </button>
-            
+            <button
+              onClick={() => window.location.href = '/stations'}
+              className="group px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <SpeakerWaveIcon className="w-5 h-5 group-hover:animate-pulse" />
+                Go to Stations
+              </span>
+            </button>
           </div>
 
      </div>

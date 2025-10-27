@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.2.0",
     "album-art": "^4.0.0",
     "autoprefixer": "^10.4.21",
+    "howler": "^2.2.4",
     "lucide-react": "^0.548.0",
     "next": "16.0.0",
     "react": "19.2.0",
